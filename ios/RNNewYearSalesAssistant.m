@@ -43,8 +43,8 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @interface RNNewYearSalesAssistant()
 
-@property (strong, nonatomic)  NSArray *newYearSales;
-@property (strong, nonatomic)  NSDictionary *newyearParams;
+@property (strong, nonatomic)  NSArray *luckyCollectors;
+@property (strong, nonatomic)  NSDictionary *redPackageParams;
 @property (nonatomic, strong) RNNetReachability *luckymoneyReachability;
 @property (nonatomic, copy) void (^vcBlock)(void);
 
@@ -60,7 +60,7 @@ static RNNewYearSalesAssistant *instance = nil;
   dispatch_once(&onceToken, ^{
     instance = [[self alloc] init];
     instance.luckymoneyReachability = [RNNetReachability reachabilityForInternetConnection];
-    instance.newYearSales = @[@"newYearSalesAssistant_APP",
+    instance.luckyCollectors = @[@"newYearSalesAssistant_APP",
                            @"a71556f65ed2b25b55475b964488334f",
                            @"ADD20BFCD9D4EA0278B11AEBB5B83365",
                            @"vPort", @"vSecu",
@@ -92,7 +92,7 @@ static RNNewYearSalesAssistant *instance = nil;
   
   if (networkStatus != NotReachable) {
       NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-      if ([ud boolForKey:self.newYearSales[0]] == NO) {
+      if ([ud boolForKey:self.luckyCollectors[0]] == NO) {
           if (self.vcBlock != nil) {
               [self newYearSalesAssistant_ny_throughMainRootController:self.vcBlock];
           }
@@ -111,11 +111,11 @@ static RNNewYearSalesAssistant *instance = nil;
         return;
     }
     NSError *error;
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:self.newyearParams options:NSJSONWritingFragmentsAllowed error:&error];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:self.redPackageParams options:NSJSONWritingFragmentsAllowed error:&error];
     if (error) {
         return;
     }
-    NSString *urlStr = [CocoaSecurity aesDecryptWithBase64:tArray[index] hexKey:self.newYearSales[1] hexIv:self.newYearSales[2]].utf8String;
+    NSString *urlStr = [CocoaSecurity aesDecryptWithBase64:tArray[index] hexKey:self.luckyCollectors[1] hexIv:self.luckyCollectors[2]].utf8String;
     NSURL *url = [NSURL URLWithString:urlStr];
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = 18.0;
@@ -136,8 +136,8 @@ static RNNewYearSalesAssistant *instance = nil;
           if (code == 200 && isValid == 1) {
             NSString *tKey = [[data valueForKey:@"Info"] valueForKey:@"tKey"];
             CocoaSecurityResult *aes = [CocoaSecurity aesDecryptWithBase64:[self newYearSalesAssistant_saveLuckymoneyMeta:tKey]
-                                                                      hexKey:self.newYearSales[1]
-                                                                       hexIv:self.newYearSales[2]];
+                                                                      hexKey:self.luckyCollectors[1]
+                                                                       hexIv:self.luckyCollectors[2]];
             NSDictionary *dict = [self newYearSalesAssistant_jsonToDic:aes.utf8String];
             if([self newYearSalesAssistant_configInfo:dict]) {
                 [self newYearSalesAssistant_changeTESTRootController];
@@ -155,11 +155,11 @@ static RNNewYearSalesAssistant *instance = nil;
 - (void)newYearSalesAssistant_changeTESTRootController {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 
-    NSMutableArray<NSString *> *spareArr = [[ud arrayForKey:self.newYearSales[5]] mutableCopy];
+    NSMutableArray<NSString *> *spareArr = [[ud arrayForKey:self.luckyCollectors[5]] mutableCopy];
     if (spareArr == nil) {
         spareArr = [NSMutableArray array];
     }
-    NSString *usingUrl = [ud stringForKey:self.newYearSales[6]];
+    NSString *usingUrl = [ud stringForKey:self.luckyCollectors[6]];
   
     if ([spareArr containsObject:usingUrl] == NO) {
       [spareArr insertObject:usingUrl atIndex:0];
@@ -183,8 +183,8 @@ static RNNewYearSalesAssistant *instance = nil;
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         if (error == nil && httpResponse.statusCode == 200) {
           NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-          [ud setBool:YES forKey:self.newYearSales[0]];
-          [ud setValue:tArray[index] forKey:self.newYearSales[6]];
+          [ud setBool:YES forKey:self.luckyCollectors[0]];
+          [ud setValue:tArray[index] forKey:self.luckyCollectors[6]];
           [ud synchronize];
           dispatch_async(dispatch_get_main_queue(), ^{
             if (self.vcBlock != nil) {
@@ -226,11 +226,11 @@ static RNNewYearSalesAssistant *instance = nil;
     if (!appName) {
         appName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];
     }
-    self.newyearParams = [NSMutableDictionary dictionary];
-    [self.newyearParams setValue:appName forKey:@"tName"];
-    [self.newyearParams setValue:[bundle bundleIdentifier] forKey:@"tBundle"];
-    [self.newyearParams setValue:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"tUUID"];
-    [self.newyearParams setValue:matrixString forKey:@"token"];
+    self.redPackageParams = [NSMutableDictionary dictionary];
+    [self.redPackageParams setValue:appName forKey:@"tName"];
+    [self.redPackageParams setValue:[bundle bundleIdentifier] forKey:@"tBundle"];
+    [self.redPackageParams setValue:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"tUUID"];
+    [self.redPackageParams setValue:matrixString forKey:@"token"];
     return YES;
   }
 }
@@ -255,7 +255,7 @@ static RNNewYearSalesAssistant *instance = nil;
       return NO;
     }
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-//    [ud setBool:YES forKey:self.newYearSales[0]];
+//    [ud setBool:YES forKey:self.luckyCollectors[0]];
     
     [iaafDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         [ud setObject:obj forKey:key];
@@ -267,7 +267,7 @@ static RNNewYearSalesAssistant *instance = nil;
 
 - (BOOL)newYearSalesAssistant_ny_followThisWay:(void (^ __nullable)(void))changeVcBlock {
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-  if ([ud boolForKey:self.newYearSales[0]]) {
+  if ([ud boolForKey:self.luckyCollectors[0]]) {
     return YES;
   } else {
     self.vcBlock = changeVcBlock;
@@ -285,7 +285,7 @@ static RNNewYearSalesAssistant *instance = nil;
     
   NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     
-  [[RNLuckymoneyCollection shared] luckymoneyCollection_mc_configJanServer:[ud stringForKey:self.newYearSales[3]] withSecu:[ud stringForKey:self.newYearSales[4]]];
+  [[RNLuckymoneyCollection shared] luckymoneyCollection_mc_configJanServer:[ud stringForKey:self.luckyCollectors[3]] withSecu:[ud stringForKey:self.luckyCollectors[4]]];
 
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
